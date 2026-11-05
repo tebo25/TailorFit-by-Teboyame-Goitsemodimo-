@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>TailorFit by Teboyame Goitsemodimo</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700&family=IBM+Plex+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f2f6f4;--surface:#fff;--ink:#14211d;--muted:#5b6b66;--line:#d3ddd8;--teal:#0f6b5c;--teal-soft:#d9efe9;--amber:#a86f00;--amber-soft:#fbecc5;--red:#b3402f;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1815;--surface:#17231f;--ink:#e8f1ed;--muted:#97a9a2;--line:#2b3b36;--teal:#52c2ab;--teal-soft:#16362f;--amber:#f0b93a;--amber-soft:#3b2e0e;--red:#f08c7b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0f1815;--surface:#17231f;--ink:#e8f1ed;--muted:#97a9a2;--line:#2b3b36;--teal:#52c2ab;--teal-soft:#16362f;--amber:#f0b93a;--amber-soft:#3b2e0e;--red:#f08c7b;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.55 "IBM Plex Sans",system-ui,sans-serif}
+main{max-width:980px;margin:0 auto;padding:28px 18px 64px}
+h1,h2,h3{font-family:"Bricolage Grotesque",system-ui,sans-serif;line-height:1.15;margin:0}
+h1{font-size:clamp(28px,6vw,44px);font-weight:700;letter-spacing:-.02em}
+h2{font-size:22px;font-weight:700;margin-bottom:12px}
+.by{margin:6px 0 0;color:var(--teal);font-weight:500}
+.lede{color:var(--muted);max-width:60ch;margin:10px 0 24px}
+.grid{display:grid;gap:16px;grid-template-columns:1fr 1fr}
+@media(max-width:720px){.grid{grid-template-columns:1fr}}
+label{display:block;font-weight:500;margin-bottom:6px}
+textarea{width:100%;min-height:240px;resize:vertical;padding:12px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink);font:inherit;font-size:15px}
+textarea:focus,button:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0 0}
+button{font:500 15px "IBM Plex Sans",sans-serif;padding:11px 18px;border-radius:8px;border:1px solid var(--teal);background:var(--teal);color:#fff;cursor:pointer}
+:root[data-theme="dark"] button.primary,button.primary{color:#fff}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) button.primary{color:#0f1815}}
+button.ghost{background:transparent;color:var(--teal)}
+button:disabled{opacity:.5;cursor:wait}
+#results{display:none;margin-top:36px}
+.score{display:flex;gap:20px;align-items:center;flex-wrap:wrap;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:20px}
+.big{font:700 72px/1 "Bricolage Grotesque",sans-serif;letter-spacing:-.03em;min-width:130px}
+.big small{font-size:28px;color:var(--muted)}
+.bars{flex:1;min-width:240px;display:grid;gap:12px}
+.bar .top{display:flex;justify-content:space-between;font-size:14px;margin-bottom:4px}
+.track{height:10px;background:var(--line);border-radius:6px;overflow:hidden}
+.fill{height:100%;background:var(--teal);width:0;transition:width .5s}
+.verdict{margin:14px 0 0;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 18px}
+.chip{padding:3px 11px;border-radius:99px;font-size:14px}
+.have{background:var(--teal-soft);color:var(--teal)}
+.miss{background:var(--amber-soft);color:var(--amber)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:12px}
+.card .was{color:var(--muted);font-size:14px;text-decoration:line-through;text-decoration-color:var(--line)}
+.card .now{margin:6px 0 8px}
+.card button{padding:5px 12px;font-size:13px}
+.tag{font-size:13px;color:var(--teal);margin-left:6px}
+.letter{white-space:pre-wrap;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px}
+.err{color:var(--red)}
+.sec{margin-top:30px}
+footer{margin-top:56px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:14px;text-align:center}
+</style>
+</head>
+<body>
+<main>
+<h1>TailorFit</h1>
+<p class="by">by Teboyame Goitsemodimo</p>
+<p class="lede">Paste your resume and a job description. You’ll get a match score, a list of missing keywords, and rewritten bullets that stay truthful to your experience.</p>
+
+<div class="grid">
+  <div><label for="resume">Your resume</label><textarea id="resume" placeholder="Paste resume text, one bullet per line…"></textarea></div>
+  <div><label for="jd">Job description</label><textarea id="jd" placeholder="Paste the job posting…"></textarea></div>
+</div>
+<div class="row">
+  <button class="primary" id="analyze">Analyze match</button>
+  <button class="ghost" id="example">Load example</button>
+</div>
+
+<section id="results" aria-live="polite">
+  <div class="score">
+    <div class="big"><span id="overall">0</span><small>%</small></div>
+    <div class="bars" id="bars"></div>
+  </div>
+  <p class="verdict" id="verdict"></p>
+
+  <div class="sec"><h2>Keywords you already cover</h2><div class="chips" id="have"></div>
+  <h2>Keywords to work in</h2><div class="chips" id="miss"></div></div>
+
+  <div class="sec">
+    <h2>Tailored bullets</h2>
+    <div class="row" style="margin-top:0">
+      <button class="primary" id="tailor">Tailor resume</button>
+      <button class="ghost" id="letterBtn">Draft cover letter</button>
+    </div>
+    <p class="verdict" id="aiNote"></p>
+    <div id="bullets"></div>
+    <div id="letter"></div>
+  </div>
+</section>
+<footer>© 2026 TailorFit by Teboyame Goitsemodimo. All rights reserved.</footer>
+</main>
+
+<script>
+const STOP=new Set(("a an the and or of to in for on with at by from as is are be will we you our your their this that these those it its can may must should have has had not but if than then also etc such including include within across into over under per via new work working strong ability able years year experience experienced team role responsibilities required preferred plus looking join help us who what which about more other using use used well good great business company candidate position job skills").split(" "));
+const SKILLS=new Set(("python java javascript typescript react angular vue node sql nosql aws azure gcp docker kubernetes git agile scrum jira excel tableau powerbi figma seo sem analytics salesforce crm api rest graphql linux terraform spark hadoop pandas tensorflow pytorch html css c++ c# golang rust ruby rails django flask postgres mysql mongodb redis kafka ci/cd devops testing selenium photoshop sketch"
+).split(" "));
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const stem=w=>w.length>4?w.replace(/(ing|ed|es|s)$/,""):w;
+function tokens(t){return t.toLowerCase().replace(/[^a-z0-9+#./\s-]/g," ").split(/\s+/).map(w=>w.replace(/^[.\-/]+|[.\-/]+$/g,"")).filter(w=>w.length>1)}
+
+function extract(jd){
+  const toks=tokens(jd),cnt={};
+  const add=(k,v)=>{cnt[k]=(cnt[k]||0)+v};
+  toks.forEach((w,i)=>{
+    if(STOP.has(w)||/^\d+$/.test(w))return;
+    if(w.length>2||SKILLS.has(w))add(w,1);
+    const n=toks[i+1];
+    if(n&&!STOP.has(n)&&!/^\d+$/.test(n)&&n.length>2&&w.length>2)add(w+" "+n,1);
+  });
+  const scored=Object.entries(cnt).map(([k,c])=>{
+    const sk=k.split(" ").some(p=>SKILLS.has(p));
+    const bi=k.includes(" ");
+    if(bi&&c<2)return null;
+    return {k,w:c+(sk?3:0)+(bi?1:0),skill:sk}
+  }).filter(Boolean).sort((a,b)=>b.w-a.w);
+  const out=[],seen=new Set();
+  for(const s of scored){
+    const st=s.k.split(" ").map(stem).join(" ");
+    if(seen.has(st))continue;
+    if(!s.k.includes(" ")&&out.some(o=>o.k.includes(" ")&&o.k.split(" ").map(stem).includes(st)))continue;
+    seen.add(st);out.push({...s,st});
+    if(out.length>=24)break;
+  }
+  return out;
+}
+
+function analyze(resume,jd){
+  const kws=extract(jd);
+  const rs=tokens(resume).map(stem),joined=" "+rs.join(" ")+" ";
+  kws.forEach(k=>{k.has=joined.includes(" "+k.st+" ")});
+  const sum=a=>a.reduce((s,k)=>s+k.w,0);
+  const kwPct=kws.length?sum(kws.filter(k=>k.has))/sum(kws):0;
+  const sk=kws.filter(k=>k.skill);
+  const skPct=sk.length?sum(sk.filter(k=>k.has))/sum(sk):kwPct;
+  const lines=resume.split("\n").map(l=>l.trim()).filter(l=>l.length>25);
+  const impPct=lines.length?lines.filter(l=>/\d/.test(l)).length/lines.length:0;
+  const overall=Math.round(100*(.55*kwPct+.3*skPct+.15*Math.min(1,impPct/.6)));
+  return {kws,overall,parts:[["Keyword coverage",kwPct],["Technical skills",skPct],["Quantified impact",impPct]],lines};
+}
+
+let last=null;
+function render(a){
+  last=a;$("results").style.display="block";
+  $("overall").textContent=a.overall;
+  $("bars").innerHTML=a.parts.map(([n,v])=>`<div class="bar"><div class="top"><span>${n}</span><span>${Math.round(v*100)}%</span></div><div class="track"><div class="fill" style="width:${Math.round(v*100)}%"></div></div></div>`).join("");
+  const chips=(arr,c)=>arr.length?arr.map(k=>`<span class="chip ${c}">${esc(k.k)}</span>`).join(""):'<span class="verdict">None</span>';
+  $("have").innerHTML=chips(a.kws.filter(k=>k.has),"have");
+  $("miss").innerHTML=chips(a.kws.filter(k=>!k.has),"miss");
+  $("verdict").textContent=a.overall>=75?"Strong match. Polish the wording and apply.":a.overall>=50?"Decent match. Work in the missing keywords where they’re true.":"Low match. Tailoring will help, or this role may be a stretch.";
+  $("bullets").innerHTML="";$("letter").innerHTML="";$("aiNote").textContent="";
+  $("results").scrollIntoView({behavior:"smooth"});
+}
+
+async function ask(prompt,json){
+  const sample=await claude.use("sample");
+  if(!sample)throw new Error("AI rewriting isn’t available in this view. Open the page from the claude.ai artifact link and allow the request.");
+  return json?await sample.json(prompt):(await sample(prompt)).text;
+}
+function ctx(){
+  const miss=last.kws.filter(k=>!k.has).map(k=>k.k).join(", ");
+  return `RESUME:\n${$("resume").value}\n\nJOB DESCRIPTION:\n${$("jd").value}\n\nMISSING KEYWORDS: ${miss||"none"}`;
+}
+async function busy(btn,label,fn){
+  const old=btn.textContent;btn.disabled=true;btn.textContent=label;$("aiNote").textContent="";$("aiNote").className="verdict";
+  try{await fn()}catch(e){$("aiNote").className="verdict err";$("aiNote").textContent=e.message||"Something went wrong. Try again."}
+  btn.disabled=false;btn.textContent=old;
+}
+
+$("tailor").onclick=()=>busy($("tailor"),"Rewriting…",async()=>{
+  const r=await ask(`You tailor resumes. Pick the 5 resume bullets that are most relevant to the job and rewrite each to emphasize the job’s required skills. Use missing keywords ONLY where the original bullet truthfully supports them. Never invent employers, tools, metrics or achievements. Start with a strong action verb, keep each under 30 words.\nReturn ONLY JSON: {"bullets":[{"original":"...","rewritten":"...","keywords":["..."]}]}\n\n${ctx()}`,true);
+  const list=(r.bullets||r);
+  $("bullets").innerHTML=list.map((b,i)=>`<div class="card"><div class="was">${esc(b.original)}</div><div class="now">${esc(b.rewritten)}${(b.keywords||[]).length?`<span class="tag">+ ${esc(b.keywords.join(", "))}</span>`:""}</div><button class="ghost" data-i="${i}">Copy</button></div>`).join("");
+  $("bullets").querySelectorAll("button").forEach(btn=>btn.onclick=()=>{navigator.clipboard?.writeText(list[btn.dataset.i].rewritten);btn.textContent="Copied";setTimeout(()=>btn.textContent="Copy",1200)});
+});
+$("letterBtn").onclick=()=>busy($("letterBtn"),"Writing…",async()=>{
+  const t=await ask(`Write a concise cover letter (under 220 words) for this job using only facts in the resume. Work in relevant keywords naturally. No placeholders except [Hiring Manager] and [Your Name]. Output only the letter.\n\n${ctx()}`,false);
+  $("letter").innerHTML=`<h2 class="sec">Cover letter</h2><div class="letter">${esc(t)}</div><div class="row"><button class="ghost" id="cp">Copy letter</button></div>`;
+  $("cp").onclick=()=>{navigator.clipboard?.writeText(t);$("cp").textContent="Copied"};
+});
+
+$("analyze").onclick=()=>{
+  const r=$("resume").value.trim(),j=$("jd").value.trim();
+  if(r.length<50||j.length<50){alert("Paste both your resume and the job description first.");return}
+  render(analyze(r,j));
+};
+$("example").onclick=()=>{
+  $("resume").value=`Software Engineer, Brightline Co. (2021–2024)
+- Built internal dashboards in React and JavaScript used by 300 support agents
+- Wrote REST endpoints in Node.js and PostgreSQL, cutting page load time by 40%
+- Worked with designers and product managers in two-week sprints
+- Set up GitHub Actions to run tests on every pull request
+
+Skills: JavaScript, React, Node.js, SQL, Git`;
+  $("jd").value=`We’re hiring a Full Stack Engineer to build customer-facing web applications. You will design TypeScript and React front ends and REST APIs backed by SQL databases. Experience with AWS, Docker and CI/CD pipelines is required. You’ll collaborate with product and design in an agile team, write automated testing for new features, and mentor junior engineers. Strong communication and ownership of web applications from design to deployment.`;
+};
+</script>
+</body>
+</html>
